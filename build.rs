@@ -1,0 +1,51 @@
+use std::{env, fs};
+
+use bindgen::Builder;
+use bindgen::callbacks::ParseCallbacks;
+use cmake::Config;
+
+#[derive(Debug)]
+struct Callbacks;
+
+impl ParseCallbacks for Callbacks {
+    fn process_comment(&self, comment: &str) -> Option<String> {
+        // This doesn't translate level-zero's doxygen comments perfectly, but it's better than nothing.
+        match doxygen_bindgen::transform(comment) {
+            Ok(res) => {
+                // doxygen_bindgen doesn't handle the @details key
+                let comment = res.replace("@details", "\n");
+                Some(comment)
+            }
+            Err(err) => {
+                println!("cargo:warning=Problem processing doxygen comment: {comment}\n{err}");
+                None
+            }
+        }
+    }
+}
+
+fn main() {
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+
+    let bindings = Builder::default()
+        .header(format!("{manifest_dir}/wrapper.h"))
+        .parse_callbacks(Box::new(Callbacks))
+        .rustified_enum(".*")
+        .generate()
+        .expect("Failed to generate bindings");
+
+    let out_dir = env::var("OUT_DIR").unwrap();
+    fs::write(format!("{out_dir}/bindings.rs"), bindings.to_string())
+        .expect("Failed to write bindings");
+
+    let dest = Config::new("level-zero")
+        .define("BUILD_STATIC", "1")
+        .build();
+
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dest.join("build/lib").display()
+    );
+    println!("cargo:rustc-link-lib=static=ze_loader");
+    println!("cargo:rustc-link-lib=stdc++")
+}
