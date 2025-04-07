@@ -47,5 +47,7 @@ fn main() {
         dest.join("lib").display()
     );
     println!("cargo:rustc-link-lib=static=ze_loader");
-    println!("cargo:rustc-link-lib=stdc++")
+    if cfg!(not(windows)) {
+        println!("cargo:rustc-link-lib=stdc++");
+    }
 }
