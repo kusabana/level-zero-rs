@@ -44,7 +44,7 @@ fn main() {
 
     println!(
         "cargo:rustc-link-search=native={}",
-        dest.join("build/lib").display()
+        dest.join("lib").display()
     );
     println!("cargo:rustc-link-lib=static=ze_loader");
     println!("cargo:rustc-link-lib=stdc++")
