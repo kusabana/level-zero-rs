@@ -26,7 +26,7 @@ impl Display for LoaderComponent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let name = self.name();
         let (major, minor, patch) = self.version();
-        writeln!(f, "{name} v{major}.{minor}.{patch}")
+        write!(f, "{name} v{major}.{minor}.{patch}")
     }
 }
 

@@ -9,7 +9,7 @@ pub struct LevelZeroError(ze_result_t);
 
 impl Display for LevelZeroError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{:#?}", self.0)
+        write!(f, "{:#?}", self.0)
     }
 }
 
