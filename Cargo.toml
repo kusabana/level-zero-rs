@@ -11,5 +11,5 @@ doxygen-bindgen = "0.1"
 cmake = "=0.1.48"
 
 [[example]]
-name = "basic"
+name = "loader"
 crate-type = ["bin"]
