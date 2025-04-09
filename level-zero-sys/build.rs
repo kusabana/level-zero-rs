@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::{env, fs};
 
 use bindgen::Builder;
@@ -25,20 +26,21 @@ impl ParseCallbacks for Callbacks {
 }
 
 fn main() {
-    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
+    let level_zero_dir = manifest_dir.join("..").join("level-zero");
 
     let bindings = Builder::default()
-        .header(format!("{manifest_dir}/wrapper.h"))
+        .header(manifest_dir.join("wrapper.h").display().to_string())
+        .clang_arg(format!("-I{}", level_zero_dir.join("include").display()))
         .parse_callbacks(Box::new(Callbacks))
         .rustified_enum(".*")
         .generate()
         .expect("Failed to generate bindings");
 
-    let out_dir = env::var("OUT_DIR").unwrap();
-    fs::write(format!("{out_dir}/bindings.rs"), bindings.to_string())
-        .expect("Failed to write bindings");
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    fs::write(out_dir.join("bindings.rs"), bindings.to_string()).expect("Failed to write bindings");
 
-    let dest = Config::new("../level-zero")
+    let dest = Config::new(level_zero_dir)
         .define("BUILD_STATIC", "1")
         .build();
 
