@@ -1,15 +1,10 @@
+[workspace]
+members = ["level-zero-sys"]
+
 [package]
-name = "level-zero-sys"
+name = "level-zero"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-
-[build-dependencies]
-bindgen = "0.71.1"
-doxygen-bindgen = "0.1"
-cmake = "=0.1.48"
-
-[[example]]
-name = "loader"
-crate-type = ["bin"]
+level-zero-sys = { path = "level-zero-sys" }

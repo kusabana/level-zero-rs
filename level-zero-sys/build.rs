@@ -38,7 +38,7 @@ fn main() {
     fs::write(format!("{out_dir}/bindings.rs"), bindings.to_string())
         .expect("Failed to write bindings");
 
-    let dest = Config::new("level-zero")
+    let dest = Config::new("../level-zero")
         .define("BUILD_STATIC", "1")
         .build();
 
