@@ -1,9 +1,9 @@
 use crate::error::Result;
 use level_zero_sys::{
-    ze_result_t, zel_component_version_t, zelDisableTracingLayer, zelEnableTracingLayer,
-    zelLoaderGetVersions,
+    ze_result_t, zel_component_version_t, zel_handle_type_t, zelDisableTracingLayer,
+    zelEnableTracingLayer, zelLoaderGetVersions, zelLoaderTranslateHandle,
 };
-use std::{fmt::Display, mem::MaybeUninit};
+use std::{ffi::c_void, fmt::Display, mem::MaybeUninit};
 
 pub struct LoaderComponent(zel_component_version_t);
 
@@ -42,7 +42,7 @@ impl Loader {
         if result != ze_result_t::ZE_RESULT_SUCCESS {
             return Err(result.into());
         }
-        
+
         let mut components: Vec<zel_component_version_t> =
             vec![unsafe { MaybeUninit::zeroed().assume_init() }; component_count];
         let result =
@@ -52,6 +52,21 @@ impl Loader {
         }
 
         Ok(components.into_iter().map(LoaderComponent).collect())
+    }
+
+    /// Translate loader handle to raw driver handle
+    // TODO: revisit this when we have better typed handles
+    pub unsafe fn translate_handle(
+        handle_type: zel_handle_type_t,
+        handle_in: *mut c_void,
+        handle_out: *mut *mut c_void,
+    ) -> Result<()> {
+        let result = unsafe { zelLoaderTranslateHandle(handle_type, handle_in, handle_out) };
+        if result != ze_result_t::ZE_RESULT_SUCCESS {
+            return Err(result.into());
+        }
+
+        Ok(())
     }
 
     /// Increments tracing layer reference count
