@@ -9,7 +9,3 @@ edition = "2024"
 bindgen = "0.71.1"
 doxygen-bindgen = "0.1"
 cmake = "=0.1.48"
-
-[[example]]
-name = "loader"
-crate-type = ["bin"]
